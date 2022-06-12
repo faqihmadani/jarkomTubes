@@ -45,7 +45,7 @@ def runTopo():
 	# Memastikan mininet bersih dari cache sebelumnya
 	os.system('mn -c')
 
-	# Membangun Topologi
+	# CLO 1 Membangun Topologi
 	topo = MyTopo()
 	net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink)
 	net.start()
@@ -85,18 +85,18 @@ def runTopo():
 	#H1
 	#ke R1
 	h1.cmd("ifconfig h1-eth0 194.169.1.1/30")
-	h1.cmd("ip route add default gw 194.169.1.2 h1-eth0")
+	#h1.cmd("ip route add default gw 194.169.1.2 h1-eth0")
 	#ke R2
 	h1.cmd("ifconfig h1-eth1 194.169.6.1/30")
-	h1.cmd("ip route add default gw 194.169.6.2 h1-eth1")
+	#h1.cmd("ip route add default gw 194.169.6.2 h1-eth1")
 	
 	#H2
 	#ke R3
 	h2.cmd("ifconfig h2-eth0 194.169.3.1/30")
-	h1.cmd("ip route add default gw 194.169.3.2 h2-eth0")
+	#h2.cmd("ip route add default gw 194.169.3.2 h2-eth0")
 	#ke R4
 	h2.cmd("ifconfig h2-eth1 194.169.4.1/30")
-	h1.cmd("ip route add default gw 194.169.4.2 h2-eth1")
+	#h2.cmd("ip route add default gw 194.169.4.2 h2-eth1")
 	
 	#R1
 	#ke H1
@@ -130,8 +130,6 @@ def runTopo():
 	#ke R1
 	r4.cmd("ifconfig r4-eth2 194.169.7.2/30")
 	
-	
-	
 	#Uji konektivitas
 	print("\nUji Konektivitas R1-R3")
 	r1.cmdPrint('ping -c 5 194.169.2.2')
@@ -154,37 +152,64 @@ def runTopo():
 	h2.cmdPrint('ping -c 5 194.169.4.2')
 	
 	
-	
-	#h1.cmd("ip route add default gw 194.169.1.2 h1-eth0")
-	#h1.cmd("ip route add default gw 194.169.6.2 h1-eth1")
+	#CLO 2 Routing
 	
 	#Routing H1
-	#h1.cmd("ip rule add from 194.169.1.1 table 1")
-	#h1.cmd("ip rule add from 194.169.6.1 table 2")
+	h1.cmd("ip rule add from 194.169.1.1 table 1")
+	h1.cmd("ip rule add from 194.169.6.1 table 2")
 	#table 1
-	#h1.cmd("ip route add 194.169.1.0/30 dev h1-eth0 scope link table 1")
-	#h1.cmd("ip route add default via 194.169.1.2 dev h1-eth0 table 1")
-	#h1.cmd("ip route add default gw 194.169.1.2 dev h1-eth0")
+	h1.cmd("ip route add 194.169.1.0/30 dev h1-eth0 scope link table 1")
+	h1.cmd("ip route add default via 194.169.1.2 dev h1-eth0 table 1")
+	h1.cmd("ip route add default gw 194.169.1.2 dev h1-eth0")
 	#table 2
-	#h1.cmd("ip route add 194.169.6.0/30 dev h1-eth1 scope link table 2")
-	#h1.cmd("ip route add default via 194.169.6.2 dev h1-eth1 table 2")
-	#h1.cmd("ip route add default gw 194.169.6.2 dev h1-eth1")
+	h1.cmd("ip route add 194.169.6.0/30 dev h1-eth1 scope link table 2")
+	h1.cmd("ip route add default via 194.169.6.2 dev h1-eth1 table 2")
+	h1.cmd("ip route add default gw 194.169.6.2 dev h1-eth1")
 	
 	#Routing H2
-	#h2.cmd("ip rule add from 194.169.3.1 table 1")
-	#h2.cmd("ip rule add from 194.169.4.1 table 2")
+	h2.cmd("ip rule add from 194.169.3.1 table 1")
+	h2.cmd("ip rule add from 194.169.4.1 table 2")
 	#table 1
-	#h2.cmd("ip route add 194.169.3.0/30 dev h2-eth0 scope link table 1")
-	#h2.cmd("ip route add default via 194.169.3.2 dev h2-eth0 table 1")
+	h2.cmd("ip route add 194.169.3.0/30 dev h2-eth0 scope link table 1")
+	h2.cmd("ip route add default via 194.169.3.2 dev h2-eth0 table 1")
 	#table 2
-	#h2.cmd("ip route add 194.169.4.0/30 dev h2-eth1 scope link table 2")
-	#h2.cmd("ip route add default via 194.169.4.2 dev h2-eth1 table 2")
+	h2.cmd("ip route add 194.169.4.0/30 dev h2-eth1 scope link table 2")
+	h2.cmd("ip route add default via 194.169.4.2 dev h2-eth1 table 2")
 	
 	
 	#Routing R1
-	#r1.cmd("route add -net ")
+	r1.cmd("sysctl net.ipv4.ip_forward=1")
+	r1.cmd("route add -net 194.169.3.0/30 gw 194.169.2.2")
+	r1.cmd("route add -net 194.169.4.0/30 gw 194.169.7.2")
+	r1.cmd("route add -net 194.169.6.0/30 gw 194.169.7.2")
+	r1.cmd("route add -net 194.169.8.0/30 gw 194.169.2.2")
+	r1.cmd("route add -net 194.169.5.0/30 gw 194.169.7.2")
 	
+	#Routing R2
+	r2.cmd("sysctl net.ipv4.ip_forward=1")
+	r2.cmd("route add -net 194.169.1.0/30 gw 194.169.8.2")
+	r2.cmd("route add -net 194.169.3.0/30 gw 194.169.8.2")
+	r2.cmd("route add -net 194.169.4.0/30 gw 194.169.5.2")
+	r2.cmd("route add -net 194.169.7.0/30 gw 194.169.5.2")
+	r2.cmd("route add -net 194.169.2.0/30 gw 194.169.8.2")
 	
+	#Routing R3
+	r3.cmd("sysctl net.ipv4.ip_forward=1")
+	r3.cmd("route add -net 194.169.1.0/30 gw 194.169.2.1")
+	r3.cmd("route add -net 194.169.6.0/30 gw 194.169.8.1")
+	r3.cmd("route add -net 194.169.4.0/30 gw 194.169.8.1")
+	r3.cmd("route add -net 194.169.7.0/30 gw 194.169.2.1")
+	r3.cmd("route add -net 194.169.5.0/30 gw 194.169.8.1")
+	
+	#Routing R4
+	r4.cmd("sysctl net.ipv4.ip_forward=1")
+	r4.cmd("route add -net 194.169.1.0/30 gw 194.169.7.1")
+	r4.cmd("route add -net 194.169.6.0/30 gw 194.169.5.1")
+	r4.cmd("route add -net 194.169.3.0/30 gw 194.169.7.1")
+	r4.cmd("route add -net 194.169.8.0/30 gw 194.169.5.1")
+	r4.cmd("route add -net 194.169.2.0/30 gw 194.169.7.1")
+	
+	print("Routing telah selesai")
 	
 	CLI(net)
 	net.stop()
