@@ -217,10 +217,23 @@ def runTopo():
 	r4.cmd("route add -net 194.169.2.0/30 gw 194.169.7.1")
 	
 	print("\nRouting telah selesai\n")
-	#host1 = [h1,h2]
-	#net.ping(host1)
-	#net.pingAll()
+
+	#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
 	
+	#CLO 3 TCP
+	#setting h2 sebagai server
+	h2.cmd("iperf -s &")
+	
+	#tcpdump
+	h2.cmd("tcpdump -c 15 -w result.pcap tcp& -i h2-eth0 ")
+	time.sleep(2)
+	
+	#h1 client
+	h1.cmd("iperf -t 5 -c 194.169.3.1 &")
+	time.sleep(5)
+	h1.cmdPrint("tcpdump -r result.pcap")
+	
+	print("Proses tcpdump telah selesai")
 	CLI(net)
 	net.stop()
 	
