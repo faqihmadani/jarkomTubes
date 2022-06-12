@@ -131,6 +131,7 @@ def runTopo():
 	r4.cmd("ifconfig r4-eth2 194.169.7.2/30")
 	
 	#Uji konektivitas
+	'''
 	print("\nUji Konektivitas R1-R3")
 	r1.cmdPrint('ping -c 5 194.169.2.2')
 	print("\n Uji Konektivitas R1-R4")
@@ -150,7 +151,7 @@ def runTopo():
 	h2.cmdPrint('ping -c 5 194.169.3.2')
 	print("\nUji Konektivitas H2-R4")
 	h2.cmdPrint('ping -c 5 194.169.4.2')
-	
+	'''
 	
 	#CLO 2 Routing
 	
@@ -161,10 +162,12 @@ def runTopo():
 	h1.cmd("ip route add 194.169.1.0/30 dev h1-eth0 scope link table 1")
 	h1.cmd("ip route add default via 194.169.1.2 dev h1-eth0 table 1")
 	h1.cmd("ip route add default gw 194.169.1.2 dev h1-eth0")
+	h1.cmd("ip route add default scope global nexthop via 194.169.1.2 dev h1-eth0")
 	#table 2
 	h1.cmd("ip route add 194.169.6.0/30 dev h1-eth1 scope link table 2")
 	h1.cmd("ip route add default via 194.169.6.2 dev h1-eth1 table 2")
 	h1.cmd("ip route add default gw 194.169.6.2 dev h1-eth1")
+	h1.cmd("ip route add default scope global nexthop via 194.169.6.2 dev h1-eth1")
 	
 	#Routing H2
 	h2.cmd("ip rule add from 194.169.3.1 table 1")
@@ -172,9 +175,13 @@ def runTopo():
 	#table 1
 	h2.cmd("ip route add 194.169.3.0/30 dev h2-eth0 scope link table 1")
 	h2.cmd("ip route add default via 194.169.3.2 dev h2-eth0 table 1")
+	h2.cmd("ip route add default gw 194.169.3.2 dev h2-eth0")
+	h2.cmd("ip route add default scope global nexthop via 194.169.3.2 dev h2-eth0")
 	#table 2
 	h2.cmd("ip route add 194.169.4.0/30 dev h2-eth1 scope link table 2")
 	h2.cmd("ip route add default via 194.169.4.2 dev h2-eth1 table 2")
+	h2.cmd("ip route add default gw 194.169.4.2 dev h2-eth1")
+	h2.cmd("ip route add default scope global nexthop via 194.169.4.2 dev h2-eth1")
 	
 	
 	#Routing R1
@@ -209,7 +216,10 @@ def runTopo():
 	r4.cmd("route add -net 194.169.8.0/30 gw 194.169.5.1")
 	r4.cmd("route add -net 194.169.2.0/30 gw 194.169.7.1")
 	
-	print("Routing telah selesai")
+	print("\nRouting telah selesai\n")
+	#host1 = [h1,h2]
+	#net.ping(host1)
+	#net.pingAll()
 	
 	CLI(net)
 	net.stop()
