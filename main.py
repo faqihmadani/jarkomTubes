@@ -35,9 +35,10 @@ class MyTopo (Topo):
 		self.addLink(h2, r3, cls=TCLink, bw=1, **linkopt)
 		self.addLink(h2, r4, cls=TCLink, bw=1, **linkopt)
 		self.addLink(r1, r3, cls=TCLink, bw=0.5, **linkopt)
-		self.addLink(r1, r4, cls=TCLink, bw=1, **linkopt)
-		self.addLink(r2, r3, cls=TCLink, bw=1, **linkopt)
 		self.addLink(r2, r4, cls=TCLink, bw=0.5, **linkopt)
+		self.addLink(r2, r3, cls=TCLink, bw=1, **linkopt)
+		self.addLink(r1, r4, cls=TCLink, bw=1, **linkopt)
+		
 		
 
 def runTopo():
@@ -84,14 +85,18 @@ def runTopo():
 	#H1
 	#ke R1
 	h1.cmd("ifconfig h1-eth0 194.169.1.1/30")
+	h1.cmd("ip route add default gw 194.169.1.2 h1-eth0")
 	#ke R2
 	h1.cmd("ifconfig h1-eth1 194.169.6.1/30")
+	h1.cmd("ip route add default gw 194.169.6.2 h1-eth1")
 	
 	#H2
 	#ke R3
 	h2.cmd("ifconfig h2-eth0 194.169.3.1/30")
+	h1.cmd("ip route add default gw 194.169.3.2 h2-eth0")
 	#ke R4
 	h2.cmd("ifconfig h2-eth1 194.169.4.1/30")
+	h1.cmd("ip route add default gw 194.169.4.2 h2-eth1")
 	
 	#R1
 	#ke H1
@@ -127,6 +132,29 @@ def runTopo():
 	
 	
 	
+	#Uji konektivitas
+	print("\nUji Konektivitas R1-R3")
+	r1.cmdPrint('ping -c 5 194.169.2.2')
+	print("\n Uji Konektivitas R1-R4")
+	r1.cmdPrint('ping -c 5 194.169.7.2')
+	
+	print("\nUji Konektivitas R2-R3")
+	r2.cmdPrint('ping -c 5 194.169.8.2')
+	print("\nUji Konektivitas R2-R4")
+	r2.cmdPrint('ping -c 5 194.169.5.2')
+	
+	print("\nUji Konektivitas H1-R1")
+	h1.cmdPrint('ping -c 5 194.169.1.2')
+	print("\nUji Konektivitas H1-R2")
+	h1.cmdPrint('ping -c 5 194.169.6.2')
+	
+	print("\nUji Konektivitas H2-R3")
+	h2.cmdPrint('ping -c 5 194.169.3.2')
+	print("\nUji Konektivitas H2-R4")
+	h2.cmdPrint('ping -c 5 194.169.4.2')
+	
+	
+	
 	#h1.cmd("ip route add default gw 194.169.1.2 h1-eth0")
 	#h1.cmd("ip route add default gw 194.169.6.2 h1-eth1")
 	
@@ -157,14 +185,6 @@ def runTopo():
 	#r1.cmd("route add -net ")
 	
 	
-	#Uji konektivitas
-	print("Uji Konektivitas H1-R1")
-	h1.cmdPrint('ping -c 3 194.169.1.2')
-	
-	r1.cmdPrint('ping -c 3 194.169.2.2')
-	
-	print("Uji Konektivitas H1-R2")
-	#h1.cmdPrint('ping -c 3 194.169.1.2')
 	
 	CLI(net)
 	net.stop()
